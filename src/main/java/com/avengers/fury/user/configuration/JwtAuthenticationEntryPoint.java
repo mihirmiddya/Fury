@@ -19,13 +19,8 @@ public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
 
     @Override
     public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException) throws IOException {
-        // Set the response status to 401 Unauthorized
         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-
-        // Log the access denied event
         logger.warn("Unauthorized access attempt detected");
-
-        // Get the writer from the response and write the access denied message
         try (PrintWriter writer = response.getWriter()) {
             logger.error("Access Denied!! :- {}", authException.getMessage());
             writer.println("Access Denied!! :- " + authException.getMessage());
