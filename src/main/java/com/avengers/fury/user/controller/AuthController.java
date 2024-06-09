@@ -13,7 +13,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
@@ -36,9 +35,11 @@ public class AuthController {
 
     @PostMapping("/login")
     public ResponseEntity<UserLoginResponse> login(@RequestBody UserLoginForm loginForm) {
+        logger.info("Login attempt for user: {}", loginForm.getEmail());
         this.doAuthenticate(loginForm.getEmail(), loginForm.getPassword());
         UserDetails userDetails = authService.loadUserByUsername(loginForm.getEmail());
         String token = this.jwtUtil.generateToken(userDetails);
+        logger.info("Token generated for user: {}", loginForm.getEmail());
         return new ResponseEntity<>(new UserLoginResponse(token), HttpStatus.OK);
     }
 
@@ -46,11 +47,11 @@ public class AuthController {
         UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(email, password);
         try {
             authenticationManager.authenticate(authentication);
-            logger.debug("User authenticated successfully.");
+            logger.debug("User authenticated successfully: {}", email);
         } catch (BadCredentialsException e) {
-            throw new BadCredentialsException(" Invalid Username or Password  !!");
+            logger.error("Authentication failed for user: {}", email);
+            throw new BadCredentialsException("Invalid Username or Password!");
         }
-
     }
 
     @PostMapping("/logout")
