@@ -5,6 +5,7 @@ import com.avengers.fury.user.dto.UserLoginForm;
 import com.avengers.fury.user.dto.UserLoginResponse;
 import com.avengers.fury.user.service.AuthService;
 import com.avengers.fury.user.service.JwtUtil;
+import com.avengers.fury.user.service.RedisService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +17,10 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.concurrent.TimeUnit;
+
+import static com.avengers.fury.user.service.RedisService.TOKEN_REDIS_KEY;
+
 @RestController
 @RequestMapping("/v1/auth")
 public class AuthController {
@@ -26,9 +31,11 @@ public class AuthController {
     @Autowired
     private AuthenticationManager authenticationManager;
 
-
     @Autowired
     private JwtUtil jwtUtil;
+
+    @Autowired
+    private RedisService redisService;
 
     private Logger logger = LoggerFactory.getLogger(AuthController.class);
 
@@ -40,6 +47,7 @@ public class AuthController {
         UserDetails userDetails = authService.loadUserByUsername(loginForm.getEmail());
         String token = this.jwtUtil.generateToken(userDetails);
         logger.info("Token generated for user: {}", loginForm.getEmail());
+        redisService.saveWithExpiry(TOKEN_REDIS_KEY.concat(userDetails.getUsername()), token, 1800, TimeUnit.SECONDS);
         return new ResponseEntity<>(new UserLoginResponse(token), HttpStatus.OK);
     }
 
