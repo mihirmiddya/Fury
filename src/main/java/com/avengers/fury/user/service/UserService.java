@@ -20,11 +20,15 @@ public class UserService {
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    private KafkaProducer kafkaProducer;
+
     public UserResponse createUser(CreateUserForm form) {
         logger.info("Creating user with email: {}", form.getEmail());
         User user = new User(form);
         userRepository.save(user);
         logger.info("User created with email: {}", form.getEmail());
+        kafkaProducer.sendMessage(user.getName());
         return new UserResponse(user);
     }
 
