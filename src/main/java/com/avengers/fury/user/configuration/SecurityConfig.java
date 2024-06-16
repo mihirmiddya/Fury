@@ -47,13 +47,11 @@ public class SecurityConfig {
 
     @Bean
     public PasswordEncoder passwordEncoder() {
-        logger.info("Creating BCryptPasswordEncoder bean");
         return new BCryptPasswordEncoder();
     }
 
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration builder) throws Exception {
-        logger.info("Creating AuthenticationManager bean");
         return builder.getAuthenticationManager();
     }
 

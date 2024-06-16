@@ -8,3 +8,23 @@ CREATE TABLE tbluser (
 
 -- Optionally, add an index on the email column if the table grows large
 CREATE INDEX idx_user_email ON tbluser (email);
+
+CREATE TABLE tbleventlog
+(
+    id SERIAL PRIMARY KEY,
+    type VARCHAR(50) NOT NULL,
+    data VARCHAR(500) ,
+    is_completed boolean DEFAULT false,
+    created_on TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    completed_on TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+)
+
+CREATE TABLE tblmaillog
+(
+    id SERIAL PRIMARY KEY,
+    to_address VARCHAR(50) NOT NULL,
+	subject VARCHAR(100) NOT NULL,
+    body VARCHAR(500) NOT NULL,
+    is_completed boolean DEFAULT false,
+    send_on TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+)
